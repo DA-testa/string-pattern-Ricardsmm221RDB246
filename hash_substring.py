@@ -1,3 +1,4 @@
+#Ricards Meiers-Meiris, 1.grupa, 221RDB246
 import os
 import sys
 
