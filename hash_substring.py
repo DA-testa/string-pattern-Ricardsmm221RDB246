@@ -1,32 +1,49 @@
-# python3
+#Ricards Meiers-Meiris, 1.grupa, 221RDB246
+import os
+import sys
 
-def read_input():
-    # this function needs to aquire input both from keyboard and file
-    # as before, use capital i (input from keyboard) and capital f (input from file) to choose which input type will follow
-    
-    
-    # after input type choice
-    # read two lines 
-    # first line is pattern 
-    # second line is text in which to look for pattern 
-    
-    # return both lines in one return
-    
-    # this is the sample return, notice the rstrip function
-    return (input().rstrip(), input().rstrip())
+def obtain_input():
+    input_type = input().strip().upper()
+    if input_type == "I":
+        pattern = input().strip()
+        text = input().strip()
+    elif input_type == "F":
+        file_path = 'tests/06'
+        try:
+            with open(file_path) as file:
+                pattern = file.readline().strip()
+                text = file.readline().strip()
+        except FileNotFoundError:
+            print("Error: file not found")
+            sys.exit(1)
+        except Exception as e:
+            print("Error:", e)
+            sys.exit(1)
+    else:
+        print("Error: invalid input choice")
+        sys.exit(1)
+    return input_type, pattern, text
 
-def print_occurrences(output):
-    # this function should control output, it doesn't need any return
+def display_occurrences(output):
     print(' '.join(map(str, output)))
 
-def get_occurrences(pattern, text):
-    # this function should find the occurances using Rabin Karp alghoritm 
+def find_occurrences(input_type, pattern, text):
+    text_length = len(text)
+    pattern_length = len(pattern)
+    prime = 31
+    prime_powers = [pow(prime, i) for i in range(pattern_length)]
+    pattern_hash = sum([ord(pattern[i]) * prime_powers[pattern_length - 1 - i] for i in range(pattern_length)])
+    text_hash = sum([ord(text[i]) * prime_powers[pattern_length - 1 - i] for i in range(pattern_length)])
+    found_matches = []
 
-    # and return an iterable variable
-    return [0]
+    for i in range(text_length - pattern_length + 1):
+        if pattern_hash == text_hash:
+            if pattern == text[i:i + pattern_length]:
+                found_matches.append(i)
+        if i < text_length - pattern_length:
+            text_hash = (text_hash - ord(text[i]) * prime_powers[pattern_length - 1]) * prime + ord(text[i + pattern_length])
 
+    return found_matches
 
-# this part launches the functions
 if __name__ == '__main__':
-    print_occurrences(get_occurrences(*read_input()))
-
+    display_occurrences(find_occurrences(*obtain_input()))
